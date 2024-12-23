@@ -1,14 +1,23 @@
-import { useState } from 'react'
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+import Navbar from "./components/Narvar";
+import Home from "./Components/Home"
+import Footer from "./Components/Footer"
+import LoginPage from "./components/LoginPage"
+import Register from "./Components/Register"
 
 function App() {
-  const [count, setCount] = useState(0)
+
   return (
-    <div>
+    <>
       <Navbar />
-      <Home />
+    {/*   <Home /> */}
+      {/* <Login /> */}
+      <Register />
       <Footer />
-    </div>
-  )
+      
+    </>
+  );
 }
 
-export default App
+export default App;
