@@ -5,6 +5,7 @@ import Home from "./Components/Home"
 import Footer from "./Components/Footer"
 import LoginPage from "./components/LoginPage"
 import Register from "./Components/Register"
+import Cart from '../components/cart'
 
 function App() {
 
@@ -13,6 +14,7 @@ function App() {
       <Navbar />
     {/*   <Home /> */}
       {/* <LoginPage /> */}
+      {/* <Cart /> */}
       <Register />
       <Footer />
       

@@ -1,4 +1,6 @@
-const CardPizza = ({ name, price, ingredients, img }) => {
+import React from 'react'
+
+export const CardPizza = ({ name, price, ingredients, img }) => {
     return (
       <div className="col-md-4">
         <div className="card mb-4">

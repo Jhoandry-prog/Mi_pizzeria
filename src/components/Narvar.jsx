@@ -1,3 +1,5 @@
+import React from "react";
+
 const Navbar = () => {
   const total = 25000;
   const token = false;
