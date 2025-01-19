@@ -1,25 +1,29 @@
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.css";
-import Navbar from "./components/Narvar";
-import Home from "./Components/Home"
-import Footer from "./Components/Footer"
-import LoginPage from "./components/LoginPage"
-import Register from "./Components/Register"
-import Cart from '../components/cart'
+import React from "react";
+import './App.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/js/bootstrap.min.js'
+import Navbar from './components/Navbar'
+/* import Home from './components/Home' */
+import Footer from './components/Footer'
+import Pizza from './components/Pizza'
+/* import Cart from './components/Cart'
+import Register from './components/Register'
+import Login from './components/Login' */
 
-function App() {
+function App () {
 
   return (
-    <>
-      <Navbar />
-    {/*   <Home /> */}
-      {/* <LoginPage /> */}
-      {/* <Cart /> */}
-      <Register />
-      <Footer />
-      
-    </>
+
+     <div>
+        <Navbar />
+        {/* <Home /> */}
+        {/* <RegisterPage /> */}
+        {/* <LoginPage /> */}
+        {/* <Cart /> */}
+        <Pizza />
+        <Footer />
+      </div>
   );
-}
+};
 
 export default App;

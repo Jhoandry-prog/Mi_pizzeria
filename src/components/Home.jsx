@@ -1,30 +1,36 @@
+import React, { useEffect, useState } from 'react'
 import Header from './Header';
 import CardPizza from './CardPizza';
 import  { pizzas } from './pizzas';
 
 const Home = () => {
+  /* guardar la Apis pizzas */
+  const [pizzas,setPizzas] = useState([])
+
+  /* para consultar a la Apis pizzas */
+  const getPizzas = async () => {
+      // URL del endpoint a consultar
+      const url = "http://localhost:5000/api/pizzas"
+      const response = await fetch(url)
+      const dataPizzas = await response.json()
+      setPizzas(dataPizzas)
+  }
+  useEffect(() => {
+      getPizzas()
+  }, [])
+
   return (
-    <div className="container my-4">
-      <Header />
-      <div className="row">
-        <CardPizza
-          name="Napolitana"
-          price={5950}
-          ingredients={["mozzarella", "tomates", "jamón", "orégano"]}
-          img="https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fpizza-1239077_640_cl.jpg?alt=media&token=6a9a33da-5c00-49d4-9080-784dcc87ec2c"
-        />
-        <CardPizza
-          name="Española"
-          price={6950}
-          ingredients={["mozzarella", "gorgonzola", "parmesano", "provolone"]}
-          img="https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fcheese-164872_640_com.jpg?alt=media&token=18b2b821-4d0d-43f2-a1c6-8c57bc388fab"
-        />
-        <CardPizza
-          name="Pepperoni"
-          price={6950}
-          ingredients={["mozzarella", "pepperoni", "orégano"]}
-          img="https://firebasestorage.googleapis.com/v0/b/apis-varias-mias.appspot.com/o/pizzeria%2Fpizza-1239077_640_com.jpg?alt=media&token=e7cde87a-08d5-4040-ac54-90f6c31eb3e3"
-        />
+    <div>
+      <h1>Lista de Pizzas</h1>
+      <div>
+        {pizzas.map((pizza) => (
+          <div key={pizza.id}>
+            <h2>{pizza.name}</h2>
+            <p>{pizza.description}</p>
+            <p>Price: ${pizza.price}</p>
+            <img src={pizza.image} alt={pizza.name} />
+          </div>
+        ))}
       </div>
     </div>
   );
