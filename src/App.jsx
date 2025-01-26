@@ -1,29 +1,36 @@
-import React from "react";
-import './App.css'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap/dist/js/bootstrap.min.js'
-import Navbar from './components/Navbar'
-/* import Home from './components/Home' */
+import Navbar from './components/Navbar.jsx'
+import Home from './pages/Home.'
 import Footer from './components/Footer'
-import Pizza from './components/Pizza'
-/* import Cart from './components/Cart'
-import Register from './components/Register'
-import Login from './components/Login' */
+import Pizza from './pages/Pizza.jsx'
+import Cart from './pages/Cart.jsx'
+import Register from './pages/Register.'
+import Login from './pages/Login.jsx'
+import { Profile } from './pages/Profile.'
+import { NotFound } from './pages/NotFound.'
+import { Route, Routes } from 'react-router-dom'
 
-function App () {
-
+function App() {
   return (
+    <div className="app-container">
+      <Navbar />
 
-     <div>
-        <Navbar />
-        {/* <Home /> */}
-        {/* <RegisterPage /> */}
-        {/* <LoginPage /> */}
-        {/* <Cart /> */}
-        <Pizza />
-        <Footer />
-      </div>
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/pizza/p001" element={<PizzaPage />} />
+          <Route path="/pizza/:id" element={<PizzaPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/404" element={<NotFoundPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </main>
+
+      <Footer />
+    </div>
   );
-};
+}
 
 export default App;

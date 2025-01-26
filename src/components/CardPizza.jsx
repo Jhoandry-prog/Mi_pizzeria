@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 export const CardPizza = ({ name, price, ingredients, img }) => {
     return (

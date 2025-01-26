@@ -1,15 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { pizzaCart } from '../pizzas'
-import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faCartShopping, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { Link } from "react-router-dom"
 
 
 
 const Cart = () => {
-
+    const carrito = <FontAwesomeIcon icon={faCartShopping}/>
     const cruz = <FontAwesomeIcon icon={faXmark} />
     const [cantidad, setCantidad] = useState([...pizzaCart])
+   
 
     const agregar = (pizza) => {
         const unaPizzamas = [...cantidad]
@@ -25,13 +27,26 @@ const Cart = () => {
         setCantidad(unaPizzamenos)
     }
 
+    const eliminar = (pizza) => {
+        const pizzaEliminada = [...cantidad]
+        const index = pizzaEliminada.findIndex(el => el.id === pizza.id)
+        pizzaEliminada.splice(index, 1)
+        setCantidad(pizzaEliminada)
+    }
+
     const total = cantidad.reduce((acumulador, items) => acumulador + (items.count * items.price), 0)
+
+
 
     return (
 
+        <div className="modal">
+           
         <aside className='cart'>
+        <p className='botonCerrarModal' > <Link to='/'> {cruz} </Link> </p>
             <p className='tituloCart'> Tu pedido</p>
-            {cantidad.map(pizza =>
+            
+            {total > 1 ? cantidad.map(pizza =>
                 <div key={pizza.id} className='pedido'>
                     <img src={pizza.img} alt={pizza.name} className='imagenPedido' />
                     <div className='detalle'>
@@ -43,20 +58,28 @@ const Cart = () => {
                             <button className='sumaResta' onClick={() => agregar(pizza)}> + </button>
                         </div>
                     </div>
-                    <p className='cerrarPedido'>{cruz}</p>
+                    <p className='cerrarPedido' onClick={() => eliminar(pizza)}>{cruz}</p>
                 </div>
 
-            )}
-            <div className='pagoCart'>
+            ) : 
+            <div className='carritoVacio'> 
+                <p className='iconoVacio'> {carrito} </p>
+            <p> Tu carrito está vacío</p></div>
+            
+            }
+           {total > 0 &&  <div className='pagoCart'>
 
                 <div className='totalCart'> <p> Total</p> <p className='totalmonto'> $ {total.toLocaleString('de-DE')} </p></div>
 
 
                 <button className='anadir'> Continuar al pago</button>
-            </div>
+            </div>}
+           
+
 
         </aside>
-
+        </div>
+       
     )
 }
 
