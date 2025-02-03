@@ -1,26 +1,56 @@
-import React from "react";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 const Navbar = () => {
-  const total = 25000;
-  const token = false;
+  const { cartTotal } = useCart();
+  const displayTotal = cartTotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+
+  const [userLoggedIn, setUserLoggedIn] = useState(false);
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
-      <a className="navbar-brand" href="#">🍕 Pizzería</a>
-      <div className="ml-auto">
-        <button className="btn btn-outline-light mx-2">🏠 Home</button>
-        {token ? (
-          <>
-            <button className="btn btn-outline-light mx-2">🔓 Profile</button>
-            <button className="btn btn-outline-light mx-2">🔒 Logout</button>
-          </>
-        ) : (
-          <>
-            <button className="btn btn-outline-light mx-2">🔐 Login</button>
-            <button className="btn btn-outline-light mx-2">🔐 Register</button>
-          </>
-        )}
-        <button className="btn btn-outline-light">🛒 Total: ${total.toLocaleString()}</button>
+    <nav className="navbar navbar-expand-lg bg-dark text-light">
+      <div className="container-fluid">
+        {/* LOGO */}
+        <Link to="/" className="navbar-brand">🍕 La Pizza Loca</Link>
+
+        {/* BOTON PARA USO MOVIL*/}
+        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+          <span className="navbar-toggler-icon"></span>
+        </button>
+
+        {/* MENÚ DE NAVEGACIÓN */}
+        <div className="collapse navbar-collapse" id="navMenu">
+          <ul className="navbar-nav me-auto">
+            <li className="nav-item">
+              <Link to="/" className="nav-link">🏡 Inicio</Link>
+            </li>
+            {!userLoggedIn ? (
+              <>
+                <li className="nav-item">
+                  <Link to="/register" className="nav-link">📋 Registrarse</Link>
+                </li>
+                <li className="nav-item">
+                  <Link to="/login" className="nav-link">🔐 Iniciar sesión</Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <Link to="/profile" className="nav-link">🙍‍♂️ Mi Cuenta</Link>
+                </li>
+                <li className="nav-item">
+                  <button className="btn btn-danger ms-2" onClick={() => setUserLoggedIn(false)}>Salir</button>
+                </li>
+              </>
+            )}
+          </ul>
+
+          {/* CARRITO */}
+          <Link to="/cart" className="btn btn-outline-warning">
+            🛒 Total: {displayTotal}
+          </Link>
+        </div>
       </div>
     </nav>
   );

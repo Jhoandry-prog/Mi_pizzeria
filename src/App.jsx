@@ -8,9 +8,11 @@ import Login from './pages/Login.jsx'
 import { Profile } from './pages/Profile.'
 import { NotFound } from './pages/NotFound.'
 import { Route, Routes } from 'react-router-dom'
+import { CartProvider } from './context/cartContext.jsx'
 
 function App() {
   return (
+    <CartProvider>
     <div className="app-container">
       <Navbar />
 
@@ -30,6 +32,7 @@ function App() {
 
       <Footer />
     </div>
+    </CartProvider>
   );
 }
 
