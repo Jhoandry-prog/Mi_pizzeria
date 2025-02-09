@@ -1,39 +1,61 @@
 import Navbar from './components/Navbar.jsx'
 import Home from './pages/Home.'
 import Footer from './components/Footer'
-import Pizza from './pages/Pizza.jsx'
-import Cart from './pages/Cart.jsx'
-import Register from './pages/Register.'
-import Login from './pages/Login.jsx'
-import { Profile } from './pages/Profile.'
-import { NotFound } from './pages/NotFound.'
+import Pizza from './Pages/Pizza.jsx'
+import Cart from './Pages/Cart.jsx'
+import Register from './Pages/Register.'
+import Login from './Pages/Login.jsx'
+import { Profile } from './Pages/Profile.'
+import { NotFound } from './Pages/NotFound.'
 import { Route, Routes } from 'react-router-dom'
-import { CartProvider } from './context/cartContext.'
+import { CartProvider } from './context/CartContext.'
+import { useUser } from './hooks/useUser.js'
 
 function App() {
+  const { token } = useUser();
+
   return (
-    <CartProvider>
-    <div className="app-container">
-      <Navbar />
-
-      <main className="main-content">
+    <>
+      <CartProvider className='box-border m-0 p-0'>
+        <Navbar/>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/pizza/p001" element={<PizzaPage />} />
-          <Route path="/pizza/:id" element={<PizzaPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/404" element={<NotFoundPage />} />
-          <Route path="*" element={<NotFoundPage />} />
+          <Route
+            path='/'
+            element={<Home/>}   
+          />
+          <Route
+            path='/pizza/:id'
+            element={<Pizza />}   
+          />
+          <Route
+            path='/register'
+            element={token === false ? <Register/> : <Navigate to='/'/>}   
+          />
+          <Route
+            path='/login'
+            element={token === false ? <Login/> : <Navigate to='/'/>}   
+          />
+          <Route
+            path='/profile'
+            element={token === false ? <Navigate to='/login'/> : <Profile name='Juan Pablo Bersezio' email='jp.bersezio@gmail.com' password='******'/>}   
+          />
+          <Route
+            path='/cart'
+            element={<Cart />}   
+          />
+          <Route
+            path='/404'
+            element={<NotFound />}   
+          />
+          <Route
+            path='/404'
+            element={<NotFound />}   
+          />
         </Routes>
-      </main>
-
-      <Footer />
-    </div>
-    </CartProvider>
-  );
+        <Footer/>
+      </CartProvider>
+    </>
+  )
 }
 
-export default App;
+export default App

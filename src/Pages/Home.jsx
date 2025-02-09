@@ -1,51 +1,41 @@
 import React, { useEffect, useState, useContext } from 'react';
 import Header from '../components/Header';
 import CardPizza from '../components/CardPizza';
-import { CartContext } from '../context/cartContext';
+import { CartContext } from '../context/CartContext';
 
-const Home = () => {
-  const [menu, setMenu] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { addToCart } = useContext(CartContext);
+const MainPage = () => {
+  const [pizzaList, setPizzaList] = useState([]); 
+  const { addItemToCart } = useShoppingCart();
+  const apiUrl = "http://localhost:5000/api/pizzas"; 
 
-  const getMenu = async () => {
+  useEffect(() => {
+    fetchPizzaData();
+  }, []);
+
+  const fetchPizzaData = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/pizzas");
-      const data = await response.json();
-      setMenu(data);
+      const response = await fetch(apiUrl);
+      const pizzaData = await response.json();
+      console.log(pizzaData); 
+      setPizzaList(pizzaData);
     } catch (error) {
-      console.error("Error al obtener las pizzas:", error);
-    } finally {
-      setIsLoading(false);
+      console.error("Error fetching pizzas:", error);
     }
   };
 
-  useEffect(() => {
-    getMenu();
-  }, []);
 
-  return (
-    <>
-      <Header />
-
-      <main>
-        {isLoading ? (
-          <p>Cargando...</p>
-        ) : (
-          menu.map(pizza => (
-            <CardPizza
-              key={pizza.id}
-              name={pizza.name}
-              price={pizza.price.toLocaleString('de-DE')}
-              ingredients={pizza.ingredients}
-              img={`/public/imgs/${pizza.name}.jpeg`}
-              onAddToCart={() => addToCart(pizza)} // Pasar función de "Añadir"
-            />
-          ))
-        )}
-      </main>
-    </>
+  
+  return ( 
+    <div className="main-page">
+      <ul>
+        {pizzaList.map((pizzaItem) => (
+          <li key={pizzaItem.id}>
+            <PizzaCard {...pizzaItem} addItemToCart={() => addItemToCart(pizzaItem)} />
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 
-export default Home;
+export default MainPage;

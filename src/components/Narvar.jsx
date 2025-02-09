@@ -1,59 +1,53 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import React, { useContext } from "react";
+import { NavLink } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import UserContext from "../Context/UserContext";
 
-const Navbar = () => {
-  const { cartTotal } = useCart();
-  const displayTotal = cartTotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+const Navbarrr = () => {
+  const { total } = useCart();
+  const { token, logout } = useContext(UserContext);
 
-  const [userLoggedIn, setUserLoggedIn] = useState(false);
+  const setActiveClass = ({ isActive }) => (isActive ? "active" : undefined);
 
   return (
-    <nav className="navbar navbar-expand-lg bg-dark text-light">
-      <div className="container-fluid">
-        {/* LOGO */}
-        <Link to="/" className="navbar-brand">🍕 La Pizza Loca</Link>
-
-        {/* BOTON PARA USO MOVIL*/}
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-          <span className="navbar-toggler-icon"></span>
-        </button>
-
-        {/* MENÚ DE NAVEGACIÓN */}
-        <div className="collapse navbar-collapse" id="navMenu">
-          <ul className="navbar-nav me-auto">
-            <li className="nav-item">
-              <Link to="/" className="nav-link">🏡 Inicio</Link>
-            </li>
-            {!userLoggedIn ? (
-              <>
-                <li className="nav-item">
-                  <Link to="/register" className="nav-link">📋 Registrarse</Link>
-                </li>
-                <li className="nav-item">
-                  <Link to="/login" className="nav-link">🔐 Iniciar sesión</Link>
-                </li>
-              </>
-            ) : (
-              <>
-                <li className="nav-item">
-                  <Link to="/profile" className="nav-link">🙍‍♂️ Mi Cuenta</Link>
-                </li>
-                <li className="nav-item">
-                  <button className="btn btn-danger ms-2" onClick={() => setUserLoggedIn(false)}>Salir</button>
-                </li>
-              </>
-            )}
-          </ul>
-
-          {/* CARRITO */}
-          <Link to="/cart" className="btn btn-outline-warning">
-            🛒 Total: {displayTotal}
-          </Link>
-        </div>
-      </div>
+    <nav className="navbar">
+      <NavLink className={`nav-link ${setActiveClass({ isActive: true })}`} to="/"> Inicio </NavLink>
+      
+      {token ? (
+        <>
+          <NavLink className={`nav-link ${setActiveClass({ isActive: true })}`} to="/profile"> Perfil </NavLink>
+          <button onClick={logout} className="nav-link logout-button"> Cerrar sesión </button>
+        </>
+      ) : (
+        <>
+          <NavLink className={`nav-link ${setActiveClass({ isActive: true })}`}  to="/login"> Ingresar </NavLink>
+          <NavLink className={`nav-link ${setActiveClass({ isActive: true })}`} to="/register"> Registro </NavLink>
+        </>
+      )}
+      <NavLink className={`nav-link ${setActiveClass({ isActive: true })}`} to="/cart"> 🛒 Total: ${total.toLocaleString("es-CL")} </NavLink>
     </nav>
   );
 };
 
-export default Navbar;
+export default Navbarrr;
+
+// import React from "react";
+// import { Link } from "react-router-dom";
+// import { useCart } from "../context/CartContext";
+
+// const Navbarrr = () => {
+//   const { total } = useCart();
+
+//   return (
+//     <nav className="navbar">
+//       <Link to="/" className="nav-link">Home</Link>
+//       <Link to="/register" className="nav-link">Registro</Link>
+//       <Link to="/login" className="nav-link">Ingresar</Link>
+//       <Link to="/profile" className="nav-link">Perfil</Link>
+//       <Link to="/cart" className="nav-link">🛒 Total: ${total.toLocaleString("es-CL")}</Link>
+//     </nav>
+//   );
+
+// };
+
+// export default Navbarrr;
