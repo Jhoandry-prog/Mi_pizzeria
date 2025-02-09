@@ -2,80 +2,98 @@ import { createContext, useState } from "react";
 
 export const CartContext = createContext();
 
-export function CartProvider({ children }) {
-    const [products, setProducts] = useState([]);
-    const [cartItems, setCartItems] = useState([]);
-    const [cartTotal, setCartTotal] = useState(0);
+export function CartProvider ({ children }) {
+    const [menu, setMenu] = useState([]);
+    const [cart, setCart] = useState([]);
+    const [total, setTotal] = useState(0);  
 
-    const fetchProducts = async () => {
+    const getData = async (url) => {
         try {
-            const response = await fetch("http://localhost:5000/api/pizzas");
-            const data = await response.json();
-            setProducts(data);
-        } catch (error) {
-            console.error("Error fetching products:", error);
+          const response = await fetch("http://localhost:5000/api/pizzas");
+          const data = await response.json();
+          setMenu(data);
+        } catch(e) {
+          console.error(e);
         }
-    };
+    }
 
-    const addToCart = (product) => {
-        const existingItemIndex = cartItems.findIndex(item => item.id === product.id);
-        let updatedCart;
+    const agregarAlCarro = (pizza) => {
+        const pizzaCartIndex = cart.findIndex(item => item.id === pizza.id)
+        let nuevoCarro
 
-        if (existingItemIndex !== -1) {
-            updatedCart = cartItems.map((item, index) =>
-                index === existingItemIndex ? { ...item, quantity: item.quantity + 1 } : item
-            );
+        if(pizzaCartIndex >= 0) {
+            nuevoCarro = structuredClone(cart)
+            nuevoCarro[pizzaCartIndex].quantity += 1
         } else {
-            updatedCart = [...cartItems, { ...product, quantity: 1 }];
+            nuevoCarro = [
+                ...cart,
+                {
+                    ...pizza,
+                    quantity: 1
+                }
+            ]
         }
 
-        updateCartState(updatedCart);
-    };
+        setCart(nuevoCarro)
+        
+        let nuevoTotal = 0;
+        nuevoCarro.forEach(item => nuevoTotal += item.price * item.quantity);
 
-    const removeFromCart = (product) => {
-        const updatedCart = cartItems.filter(item => item.id !== product.id);
-        updateCartState(updatedCart);
-    };
+        setTotal(nuevoTotal)
+    }
 
-    const increaseQuantity = (product) => {
-        const updatedCart = cartItems.map(item =>
-            item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
-        updateCartState(updatedCart);
-    };
+    const removerDelCarro = (pizza) => {
+        const nuevoCarro = cart.filter(item => item.id !== pizza.id)
+        setCart(nuevoCarro)
 
-    const decreaseQuantity = (product) => {
-        const updatedCart = cartItems.reduce((acc, item) => {
-            if (item.id === product.id) {
-                if (item.quantity > 1) {
-                    acc.push({ ...item, quantity: item.quantity - 1 });
-                }
-            } else {
-                acc.push(item);
-            }
-            return acc;
-        }, []);
-        updateCartState(updatedCart);
-    };
+        let nuevoTotal = 0
+        nuevoCarro.forEach(item => nuevoTotal += item.price * item.quantity)
+        setTotal(nuevoTotal)
+    }
 
-    const updateCartState = (updatedCart) => {
-        setCartItems(updatedCart);
-        const newTotal = updatedCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        setCartTotal(newTotal);
-    };
+    const aumentarCantidad = (pizza) => {
+        const nuevaCantidad = [...cart];
+        const index = nuevaCantidad.findIndex(ele => ele.id === pizza.id);
+        let total = 0
+        nuevaCantidad[index].quantity++;
+        nuevaCantidad.forEach(ele => {
+            total += ele.price * ele.quantity });
+        setCart(nuevaCantidad);
+        setTotal(total)
+    }
+
+
+    const disminuirCantidad = (pizza) => {
+        const nuevaCantidad = [...cart];
+        const index = nuevaCantidad.findIndex(ele => ele.name === pizza.name);
+        nuevaCantidad[index].quantity--;
+        let total = 0
+        nuevaCantidad.forEach(ele => {
+            total += ele.price * ele.quantity });
+        if(nuevaCantidad[index].quantity <= 0) {
+            nuevaCantidad.splice(index, 1);
+        }
+        setCart(nuevaCantidad);
+        setTotal(total);
+    }
 
     return (
         <CartContext.Provider value={{
-            fetchProducts,
-            products,
-            cartItems,
-            cartTotal,
-            addToCart,
-            removeFromCart,
-            increaseQuantity,
-            decreaseQuantity
-        }}>
+            getData,
+            menu,
+            setMenu,
+            cart,
+            setCart,
+            total,
+            setTotal,
+            agregarAlCarro,
+            removerDelCarro,
+            aumentarCantidad,
+            disminuirCantidad,
+        }}
+        
+        >
             {children}
         </CartContext.Provider>
-    );
-}
+    )
+} 
