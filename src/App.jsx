@@ -10,6 +10,7 @@ import { NotFound } from './Pages/NotFound.'
 import { Route, Routes } from 'react-router-dom'
 import { CartProvider } from './context/CartContext.'
 import { useUser } from './hooks/useUser.js'
+import { useAuth } from "./context/UserContext";  // Importamos el contexto de autenticación
 
 function App() {
   const { token } = useUser();

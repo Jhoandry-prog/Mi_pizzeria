@@ -1,118 +1,106 @@
-import React, { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleExclamation, faCircleCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { useState } from 'react'
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { useAuth } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
-const SignUp = () => {
-  const [username, setUsername] = useState("");
+const RegisterPage = () => {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [validationErrors, setValidationErrors] = useState({
-    username: false,
-    password: false,
-    confirmPassword: false,
-  });
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false); // Estado para manejar el cargando
 
-  useEffect(() => {
-    const updateScreenWidth = () => {
-      setScreenWidth(window.innerWidth);
-    };
-
-    window.addEventListener('resize', updateScreenWidth);
-
-    return () => {
-      window.removeEventListener('resize', updateScreenWidth);
-    };
-  }, []);
-
-  const handleFormSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const errors = {
-      username: username.trim() === "",
-      password: password.length < 6,
-      confirmPassword: password !== confirmPassword,
-    };
 
-    if (Object.values(errors).some((error) => error)) {
-      setValidationErrors(errors);
-    } else {
-      setValidationErrors({ username: false, password: false, confirmPassword: false });
-      setUsername("");
-      setPassword("");
-      setConfirmPassword("");
-      setIsRegistered(true);
+    // Validar los datos del formulario
+    if (!email || !password || !confirmPassword) {
+      setError("Todos los campos son obligatorios.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Las contraseñas no coinciden.");
+      return;
+    }
+
+    setError(""); // Limpiar posibles errores previos
+    setLoading(true); // Activar el estado de carga
+
+    try {
+      await register(email, password); // Llamar a la función de registro del contexto
+      setSuccess("¡Registro exitoso! Ahora puedes iniciar sesión.");
+      setTimeout(() => {
+        navigate("/login"); // Redirigir al login después del registro
+      }, 2000);
+    } catch (err) {
+      setError("Error al registrar. Intenta nuevamente.");
+    } finally {
+      setLoading(false); // Desactivar el estado de carga
     }
   };
 
   return (
-    <div className="signup-container">
-      <header>
-        <div className="header-content">
-          <Link to='/' className="close-button">
-            <FontAwesomeIcon icon={faTimes} />
-          </Link>
-          {isRegistered ? (
-            <div className="success-message">
-              <FontAwesomeIcon icon={faCircleCheck} className="icon-success" />
-              <h2>¡Registro exitoso! <br />
-                <span>Tu próxima degustación comienza aquí.</span>
-              </h2>
-            </div>
-          ) : (
-            <div className="form-wrapper">
-              <h2>Únete a <span>Pizza Express</span></h2>
-              <form onSubmit={handleFormSubmit} noValidate>
-                <div className="form-group">
-                  <input
-                    type="text"
-                    placeholder="Nombre de usuario"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                  {validationErrors.username && (
-                    <p className="error-message">
-                      <FontAwesomeIcon icon={faCircleExclamation} /> El nombre no puede estar vacío
-                    </p>
-                  )}
-                </div>
-                <div className="form-group">
-                  <input
-                    type="password"
-                    placeholder="Contraseña"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  {validationErrors.password && (
-                    <p className="error-message">
-                      <FontAwesomeIcon icon={faCircleExclamation} /> La contraseña debe tener al menos 6 caracteres
-                    </p>
-                  )}
-                </div>
-                <div className="form-group">
-                  <input
-                    type="password"
-                    placeholder="Confirma tu contraseña"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                  />
-                  {validationErrors.confirmPassword && (
-                    <p className="error-message">
-                      <FontAwesomeIcon icon={faCircleExclamation} /> Las contraseñas no coinciden
-                    </p>
-                  )}
-                </div>
-                <button type="submit" className="submit-button">Registrar</button>
-              </form>
-            </div>
-          )}
+    <div className="container w-50 mx-auto mt-5">
+      <form onSubmit={handleSubmit} className="rounded p-4 border shadow">
+        <h2 className="text-start mb-4">Registro</h2>
+
+        {/* Mensajes de error o éxito */}
+        {error && <div className="alert alert-danger">{error}</div>}
+        {success && <div className="alert alert-success">{success}</div>}
+
+        {/* Campo de correo */}
+        <div className="mb-3">
+          <label className="form-label">Email</label>
+          <input
+            type="email"
+            className="form-control"
+            placeholder="Ingresa tu email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
         </div>
-        {screenWidth > 768 && <img src="/imgs/Header_Responsive.jpeg" alt="Pizza Header" className="header-image" />}
-      </header>
+
+        {/* Campo de contraseña */}
+        <div className="mb-3">
+          <label className="form-label">Contraseña</label>
+          <input
+            type="password"
+            className="form-control"
+            placeholder="Ingresa tu contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Confirmar contraseña */}
+        <div className="mb-3">
+          <label className="form-label">Repetir Contraseña</label>
+          <input
+            type="password"
+            className="form-control"
+            placeholder="Repite tu contraseña"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Botón para crear cuenta */}
+        <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+          {loading ? "Registrando..." : "Crear Cuenta"}
+        </button>
+      </form>
     </div>
   );
 };
 
-export default SignUp;
+export default RegisterPage;

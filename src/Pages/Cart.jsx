@@ -1,42 +1,88 @@
-import React from "react";
-import { useShoppingCart } from "../context/CartContext";
-import { useAuth } from "../context/UserContext";
+import React, { useState, useEffect } from "react";
+import { useCart } from "../context/CartContext";
+import { useUser } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
-const ShoppingCart = () => {
-  const { cartItems, modifyQuantity, totalAmount } = useShoppingCart();
-  const { isAuthenticated } = useAuth();
+const Cart = () => {
+  const { cart, total, clearCart } = useCart();
+  const [message, setMessage] = useState({ text: "", type: "" });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (message.text) {
+      const timer = setTimeout(() => {
+        setMessage({ text: "", type: "" });
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  const handleCheckout = async () => {
+    if (cart.length === 0) {
+      setMessage({ text: "El carrito está vacío. Agrega productos antes de realizar la compra.", type: "danger" });
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/checkouts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: cart, total }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage({ text: "¡Compra realizada con éxito! Te redirigiremos pronto.", type: "success" });
+        clearCart();
+        setTimeout(() => navigate("/"), 3000); // Redirigir después de 5 segundos
+      } else {
+        setMessage({ text: data.message || "Hubo un problema al procesar la compra.", type: "danger" });
+      }
+    } catch (error) {
+      console.error("Error al procesar el checkout:", error);
+      setMessage({ text: "Hubo un error al procesar tu compra. Intenta de nuevo.", type: "danger" });
+    }
+  };
 
   return (
-    <div className="cart-container">
-      <h3>Resumen de tu compra:</h3>
-      <div className="cart-items">
-        {cartItems.map(({ id, img, name, price, quantity }) => (
-          <div key={id} className="cart-item">
-            <img src={img} alt={name} className="cart-item-img" />
+    <div className="container my-5">
+      <h2>Carrito de Compras</h2>
 
-            <div className="cart-item-details">
-              <span className="cart-item-name">{name}</span>
-              <span className="cart-item-price">${price.toLocaleString("es-CL")}</span>
-            </div>
+      {/* MOSTRAR MENSAJE DE EXITO O ERROR */}
+      {message.text && (
+        <div className={`alert alert-${message.type}`}>
+          {message.text}
+        </div>
+      )}
 
-            <div className="cart-item-controls">
-              <button onClick={() => modifyQuantity(id, -1)} className="decrease-button">
-                -
-              </button>
-              <span className="cart-item-quantity">{quantity}</span>
-              <button onClick={() => modifyQuantity(id, 1)} className="increase-button">
-                +
-              </button>
+      {/* MOSTRAR LOS PRODUCTOS EN EL CARRITO */}
+      <div className="my-3">
+        {cart.length > 0 ? (
+          cart.map(({ name, quantity, price }, index) => (
+            <div key={index} className="d-flex justify-content-between border-bottom py-2">
+              <span>{name} x{quantity}</span>
+              <span>${(price * quantity).toFixed(2)}</span>
             </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <p>No hay productos en el carrito.</p>
+        )}
       </div>
-      <div className="cart-total">Total: ${totalAmount.toLocaleString("es-CL")}</div>
-      <button className="checkout-button" disabled={!isAuthenticated}>
-        {isAuthenticated ? "Finalizar Compra" : "Inicia sesión para comprar"}
+
+      {/* TOTAL DEL CARRITO */}
+      <div className="d-flex justify-content-between my-3">
+        <strong>Total: </strong>
+        <strong>${total.toFixed(2)}</strong>
+      </div>
+
+      {/* Botón de checkout */}
+      <button className="btn btn-dark" onClick={handleCheckout}>
+        Confirmar
       </button>
     </div>
   );
 };
 
-export default ShoppingCart;
+export default Cart;
